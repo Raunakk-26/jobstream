@@ -1,1 +1,1 @@
-web: gunicorn run:app
+web: python -m app.services.ingestion && gunicorn run:app
