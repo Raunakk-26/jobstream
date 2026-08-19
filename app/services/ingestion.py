@@ -1,138 +1,160 @@
-import sqlite3
+from app.database.database import (
+    create_jobs_table,
+    save_job,
+    save_ingestion_report
+)
+
+from app.fetchers.himalayas_fetcher import HimalayasFetcher
+from app.fetchers.himalayas_rss_fetcher import HimalayasRSSFetcher
+
+from app.parsers.job_parser import JobParser
+from app.parsers.rss_job_parser import RSSJobParser
 
 
-DATABASE_NAME = "jobs.db"
+def run_ingestion():
 
+    # Create database tables if they do not exist
+    create_jobs_table()
 
-def get_connection():
-    connection = sqlite3.connect(DATABASE_NAME)
-    connection.row_factory = sqlite3.Row
-    return connection
+    source = "Himalayas API"
+    fallback_used = False
+    error = None
 
+    fetched_jobs = []
 
-def create_jobs_table():
+    # ---------------------------------------------------------
+    # PRIMARY SOURCE: HIMALAYAS API
+    # ---------------------------------------------------------
 
-    connection = get_connection()
+    try:
 
-    connection.execute("""
-        CREATE TABLE IF NOT EXISTS jobs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            company TEXT NOT NULL,
-            location TEXT,
-            employment_type TEXT,
-            salary TEXT,
-            seniority TEXT,
-            description TEXT,
-            url TEXT UNIQUE NOT NULL,
-            source TEXT NOT NULL,
-            published_at TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        fetcher = HimalayasFetcher()
+
+        fetched_jobs = fetcher.fetch_jobs(
+            limit=20
         )
-    """)
 
-    connection.execute("""
-        CREATE TABLE IF NOT EXISTS ingestion_runs (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            source TEXT NOT NULL,
-            fetched INTEGER NOT NULL,
-            new_jobs INTEGER NOT NULL,
-            duplicates INTEGER NOT NULL,
-            fallback_used INTEGER NOT NULL,
-            error TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    except Exception as api_error:
+
+        print(
+            f"API failed: {api_error}"
         )
-    """)
 
-    connection.commit()
-    connection.close()
+        # -----------------------------------------------------
+        # FALLBACK: HIMALAYAS RSS
+        # -----------------------------------------------------
 
+        try:
 
-def save_job(job):
+            fallback_used = True
+            source = "Himalayas RSS"
 
-    connection = get_connection()
+            rss_fetcher = HimalayasRSSFetcher()
 
-    cursor = connection.execute("""
-        INSERT OR IGNORE INTO jobs (
-            title,
-            company,
-            location,
-            employment_type,
-            salary,
-            seniority,
-            description,
-            url,
-            source,
-            published_at
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (
-        job["title"],
-        job["company"],
-        job["location"],
-        job["employment_type"],
-        job["salary"],
-        job["seniority"],
-        job["description"],
-        job["url"],
-        job["source"],
-        job["published_at"]
-    ))
+            fetched_jobs = rss_fetcher.fetch_jobs()
 
-    connection.commit()
+        except Exception as rss_error:
 
-    inserted = cursor.rowcount == 1
+            error = str(rss_error)
 
-    connection.close()
+            print(
+                f"RSS fallback failed: {rss_error}"
+            )
 
-    return inserted
+            fetched_jobs = []
 
 
-def save_ingestion_report(report):
+    # ---------------------------------------------------------
+    # PARSE JOBS
+    # ---------------------------------------------------------
 
-    connection = get_connection()
+    if fallback_used:
 
-    connection.execute("""
-        INSERT INTO ingestion_runs (
-            source,
-            fetched,
-            new_jobs,
-            duplicates,
-            fallback_used,
-            error
-        )
-        VALUES (?, ?, ?, ?, ?, ?)
-    """, (
-        report["source"],
-        report["fetched"],
-        report["new_jobs"],
-        report["duplicates"],
-        int(report["fallback_used"]),
-        report["error"]
-    ))
+        parser = RSSJobParser()
 
-    connection.commit()
-    connection.close()
+    else:
+
+        parser = JobParser()
 
 
-def get_latest_ingestion():
+    new_jobs = 0
+    duplicates = 0
 
-    connection = get_connection()
 
-    report = connection.execute("""
-        SELECT
-            source,
-            fetched,
-            new_jobs,
-            duplicates,
-            fallback_used,
-            error,
-            created_at
-        FROM ingestion_runs
-        ORDER BY id DESC
-        LIMIT 1
-    """).fetchone()
+    # ---------------------------------------------------------
+    # SAVE JOBS
+    # ---------------------------------------------------------
 
-    connection.close()
+    for raw_job in fetched_jobs:
+
+        try:
+
+            job = parser.parse_job(
+                raw_job
+            )
+
+            inserted = save_job(
+                job
+            )
+
+            if inserted:
+
+                new_jobs += 1
+
+            else:
+
+                duplicates += 1
+
+        except Exception as parse_error:
+
+            print(
+                f"Could not process job: {parse_error}"
+            )
+
+
+    # ---------------------------------------------------------
+    # SAVE INGESTION REPORT
+    # ---------------------------------------------------------
+
+    report = {
+
+        "source": source,
+
+        "fetched": len(fetched_jobs),
+
+        "new_jobs": new_jobs,
+
+        "duplicates": duplicates,
+
+        "fallback_used": fallback_used,
+
+        "error": error
+    }
+
+
+    save_ingestion_report(
+        report
+    )
+
+
+    # ---------------------------------------------------------
+    # PRINT REPORT
+    # ---------------------------------------------------------
+
+    print()
+    print("========== INGESTION REPORT ==========")
+    print(f"Source:       {source}")
+    print(f"Fetched:      {len(fetched_jobs)}")
+    print(f"New jobs:     {new_jobs}")
+    print(f"Duplicates:   {duplicates}")
+    print(f"Fallback:     {fallback_used}")
+    print("======================================")
+    print()
+
 
     return report
+
+
+if __name__ == "__main__":
+
+    run_ingestion()
