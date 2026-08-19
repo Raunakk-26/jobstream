@@ -1,14 +1,34 @@
 import sqlite3
+from pathlib import Path
 
 
-DATABASE_NAME = "jobs.db"
+# ============================================================
+# DATABASE PATH
+# ============================================================
 
+BASE_DIR = Path(__file__).resolve().parents[2]
+
+DATABASE_PATH = BASE_DIR / "jobs.db"
+
+
+# ============================================================
+# CONNECTION
+# ============================================================
 
 def get_connection():
-    connection = sqlite3.connect(DATABASE_NAME)
+
+    connection = sqlite3.connect(
+        str(DATABASE_PATH)
+    )
+
     connection.row_factory = sqlite3.Row
+
     return connection
 
+
+# ============================================================
+# CREATE TABLES
+# ============================================================
 
 def create_jobs_table():
 
@@ -45,8 +65,13 @@ def create_jobs_table():
     """)
 
     connection.commit()
+
     connection.close()
 
+
+# ============================================================
+# SAVE JOB
+# ============================================================
 
 def save_job(job):
 
@@ -88,6 +113,10 @@ def save_job(job):
     return inserted
 
 
+# ============================================================
+# SAVE INGESTION REPORT
+# ============================================================
+
 def save_ingestion_report(report):
 
     connection = get_connection()
@@ -112,8 +141,13 @@ def save_ingestion_report(report):
     ))
 
     connection.commit()
+
     connection.close()
 
+
+# ============================================================
+# GET LATEST INGESTION
+# ============================================================
 
 def get_latest_ingestion():
 

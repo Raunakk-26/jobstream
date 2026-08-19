@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template
 
 from app.database.database import (
     get_connection,
-    get_latest_ingestion
+    get_latest_ingestion,
+    create_jobs_table
 )
 
 
@@ -15,6 +16,9 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
+
+    # Make sure the database tables exist
+    create_jobs_table()
 
     connection = get_connection()
 
