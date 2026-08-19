@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        JobStream — Resilient Job Ingestion
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     TOP BAR
+========================================================= -->
+
+<header class="topbar">
+
+    <div class="brand">
+
+        <div class="brand-mark">
+            J
+        </div>
+
+        <div>
+
+            <h1>
+                JobStream
+            </h1>
+
+            <p>
+                Resilient job ingestion
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="health">
+
+        <span class="status-dot"></span>
+
+        {% if ingestion %}
+
+            <span>
+                Last run {{ ingestion["created_at"] }}
+            </span>
+
+        {% else %}
+
+            <span>
+                Pipeline ready
+            </span>
+
+        {% endif %}
+
+    </div>
+
+</header>
+
+
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<main class="container">
+
+
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
+
+    <section class="hero">
+
+        <div>
+
+            <p class="eyebrow">
+                INGESTION DASHBOARD
+            </p>
+
+            <h2>
+                Real jobs.<br>
+                Reliable pipeline.
+            </h2>
+
+            <p class="hero-text">
+                A resilient job ingestion system with a primary API,
+                RSS fallback, normalization and duplicate protection.
+            </p>
+
+        </div>
+
+
+        <div class="hero-card">
+
+            <span>
+                LAST INGESTION
+            </span>
+
+            {% if ingestion %}
+
+                <strong>
+                    {{ ingestion["source"] }}
+                </strong>
+
+                {% if ingestion["fallback_used"] %}
+
+                    <small>
+                        RSS fallback used
+                    </small>
+
+                {% else %}
+
+                    <small>
+                        Primary source
+                    </small>
+
+                {% endif %}
+
+            {% else %}
+
+                <strong>
+                    —
+                </strong>
+
+                <small>
+                    No ingestion yet
+                </small>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         STATS
+    ====================================================== -->
+
+    <section class="stats">
+
+
+        <div class="stat-card">
+
+            <span>
+                JOBS SHOWN
+            </span>
+
+            <strong>
+                {{ jobs|length }}
+            </strong>
+
+            <small>
+                latest stored jobs
+            </small>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span>
+                FETCHED
+            </span>
+
+            {% if ingestion %}
+
+                <strong>
+                    {{ ingestion["fetched"] }}
+                </strong>
+
+                <small>
+                    from last ingestion
+                </small>
+
+            {% else %}
+
+                <strong>
+                    —
+                </strong>
+
+                <small>
+                    No run recorded
+                </small>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span>
+                DUPLICATES
+            </span>
+
+            {% if ingestion %}
+
+                <strong>
+                    {{ ingestion["duplicates"] }}
+                </strong>
+
+                <small>
+                    rejected by deduplication
+                </small>
+
+            {% else %}
+
+                <strong>
+                    —
+                </strong>
+
+                <small>
+                    No run recorded
+                </small>
+
+            {% endif %}
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- =====================================================
+         PIPELINE
+    ====================================================== -->
+
+    <section class="pipeline-section">
+
+        <div class="pipeline-header">
+
+            <p class="eyebrow">
+                PIPELINE
+            </p>
+
+            <h3>
+                Ingestion flow
+            </h3>
+
+        </div>
+
+
+        <div class="pipeline-flow">
+
+
+            <div class="pipeline-step">
+
+                <span class="step-number">
+                    01
+                </span>
+
+                <strong>
+                    Primary API
+                </strong>
+
+                <small>
+                    Himalayas JSON API
+                </small>
+
+            </div>
+
+
+            <div class="pipeline-arrow">
+                →
+            </div>
+
+
+            <div class="pipeline-step">
+
+                <span class="step-number">
+                    02
+                </span>
+
+                <strong>
+                    RSS fallback
+                </strong>
+
+                <small>
+                    Used when primary fails
+                </small>
+
+            </div>
+
+
+            <div class="pipeline-arrow">
+                →
+            </div>
+
+
+            <div class="pipeline-step">
+
+                <span class="step-number">
+                    03
+                </span>
+
+                <strong>
+                    Normalize
+                </strong>
+
+                <small>
+                    Common job schema
+                </small>
+
+            </div>
+
+
+            <div class="pipeline-arrow">
+                →
+            </div>
+
+
+            <div class="pipeline-step">
+
+                <span class="step-number">
+                    04
+                </span>
+
+                <strong>
+                    Deduplicate
+                </strong>
+
+                <small>
+                    Unique listing URLs
+                </small>
+
+            </div>
+
+
+            <div class="pipeline-arrow">
+                →
+            </div>
+
+
+            <div class="pipeline-step">
+
+                <span class="step-number">
+                    05
+                </span>
+
+                <strong>
+                    SQLite
+                </strong>
+
+                <small>
+                    Persistent storage
+                </small>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         JOB FEED
+    ====================================================== -->
+
+    <section class="jobs-section">
+
+
+        <div class="section-heading">
+
+            <div>
+
+                <p class="eyebrow">
+                    JOB FEED
+                </p>
+
+                <h3>
+                    Latest listings
+                </h3>
+
+            </div>
+
+
+            <span class="job-count">
+                {{ jobs|length }} shown
+            </span>
+
+        </div>
+
+
+
+        <div class="jobs-list">
+
+
+            {% for job in jobs %}
+
+
+                <article class="job-card">
+
+
+                    <div class="job-main">
+
+
+                        <div class="company-logo">
+
+                            {{ job["company"][0]
+                               if job["company"]
+                               else "?"
+                            }}
+
+                        </div>
+
+
+                        <div class="job-info">
+
+
+                            <h4>
+                                {{ job["title"] }}
+                            </h4>
+
+
+                            <p class="company">
+                                {{ job["company"] }}
+                            </p>
+
+
+                            <div class="job-meta">
+
+
+                                {% if job["location"] %}
+
+                                    <span>
+                                        📍 {{ job["location"] }}
+                                    </span>
+
+                                {% endif %}
+
+
+                                {% if job["employment_type"] %}
+
+                                    <span>
+                                        {{ job["employment_type"] }}
+                                    </span>
+
+                                {% endif %}
+
+
+                                {% if job["seniority"] %}
+
+                                    <span>
+                                        {{ job["seniority"] }}
+                                    </span>
+
+                                {% endif %}
+
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <div class="job-side">
+
+
+                        {% if job["salary"] %}
+
+                            <span class="salary">
+                                {{ job["salary"] }}
+                            </span>
+
+                        {% else %}
+
+                            <span class="salary muted">
+                                Salary not listed
+                            </span>
+
+                        {% endif %}
+
+
+                        <a
+                            href="{{ job['url'] }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Original listing →
+                        </a>
+
+
+                    </div>
+
+
+                </article>
+
+
+            {% else %}
+
+
+                <div class="empty-state">
+
+                    <h4>
+                        No jobs found.
+                    </h4>
+
+                    <p>
+                        Run the ingestion pipeline first.
+                    </p>
+
+                </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+
+    </section>
+
+
+</main>
+
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer>
+
+    <p>
+        JobStream · Built as an ingestion engineering challenge
+    </p>
+
+</footer>
+
+
+</body>
+
+</html>

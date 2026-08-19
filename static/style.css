@@ -1,0 +1,651 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+body {
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    background: #f6f7f9;
+    color: #15171a;
+
+    line-height: 1.5;
+}
+
+
+.topbar {
+    height: 76px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 5vw;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+
+.brand {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.brand-mark {
+    width: 38px;
+    height: 38px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 10px;
+
+    background: #111827;
+    color: white;
+
+    font-weight: 800;
+}
+
+
+.brand h1 {
+    font-size: 16px;
+    letter-spacing: -0.02em;
+}
+
+
+.brand p {
+    color: #737780;
+    font-size: 12px;
+}
+
+
+.health {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    font-size: 13px;
+    color: #555b64;
+}
+
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+}
+
+
+.container {
+    width: min(1180px, 90%);
+
+    margin: auto;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 40px;
+
+    padding: 90px 0 65px;
+}
+
+
+.eyebrow {
+    font-size: 11px;
+    font-weight: 800;
+
+    letter-spacing: 0.14em;
+
+    color: #737780;
+
+    margin-bottom: 14px;
+}
+
+
+.hero h2 {
+    max-width: 700px;
+
+    font-size: clamp(48px, 7vw, 86px);
+
+    line-height: 0.95;
+
+    letter-spacing: -0.06em;
+}
+
+
+.hero-text {
+    max-width: 580px;
+
+    margin-top: 25px;
+
+    font-size: 17px;
+
+    color: #686e78;
+}
+
+
+.hero-card {
+    min-width: 230px;
+
+    padding: 25px;
+
+    border-radius: 18px;
+
+    background: #111827;
+
+    color: white;
+
+    box-shadow:
+        0 18px 45px rgba(0, 0, 0, 0.12);
+}
+
+
+.hero-card span {
+    display: block;
+
+    font-size: 10px;
+
+    letter-spacing: 0.14em;
+
+    color: #9ca3af;
+
+    margin-bottom: 12px;
+}
+
+
+.hero-card strong {
+    display: block;
+
+    font-size: 24px;
+}
+
+
+.hero-card small {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #9ca3af;
+}
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 14px;
+
+    margin-bottom: 80px;
+}
+
+
+.stat-card {
+    padding: 24px;
+
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 16px;
+
+    transition:
+        transform 180ms ease,
+        box-shadow 180ms ease;
+}
+
+
+.stat-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.06);
+}
+
+
+.stat-card span {
+    display: block;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.12em;
+
+    color: #858a92;
+}
+
+
+.stat-card strong {
+    display: block;
+
+    margin-top: 10px;
+
+    font-size: 28px;
+}
+
+
+.stat-card small {
+    color: #858a92;
+}
+
+
+/* =========================================================
+   PIPELINE
+========================================================= */
+
+.pipeline-section {
+    margin-bottom: 80px;
+}
+
+
+.pipeline-header {
+    margin-bottom: 20px;
+}
+
+
+.pipeline-header h3 {
+    font-size: 30px;
+
+    letter-spacing: -0.04em;
+}
+
+
+.pipeline-flow {
+    display: flex;
+
+    align-items: stretch;
+
+    gap: 10px;
+}
+
+
+.pipeline-step {
+    flex: 1;
+
+    padding: 20px;
+
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+}
+
+
+.step-number {
+    display: block;
+
+    margin-bottom: 18px;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 0.1em;
+
+    color: #92969d;
+}
+
+
+.pipeline-step strong {
+    display: block;
+
+    font-size: 15px;
+}
+
+
+.pipeline-step small {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #858a92;
+
+    font-size: 12px;
+}
+
+
+.pipeline-arrow {
+    display: grid;
+
+    place-items: center;
+
+    color: #9ca3af;
+
+    font-size: 20px;
+}
+
+
+/* =========================================================
+   JOBS
+========================================================= */
+
+.jobs-section {
+    padding-bottom: 90px;
+}
+
+
+.section-heading {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-end;
+
+    margin-bottom: 20px;
+}
+
+
+.section-heading h3 {
+    font-size: 30px;
+
+    letter-spacing: -0.04em;
+}
+
+
+.job-count {
+    font-size: 13px;
+
+    color: #858a92;
+}
+
+
+.jobs-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+
+.job-card {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 30px;
+
+    padding: 22px;
+
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 16px;
+
+    transition:
+        transform 180ms ease,
+        border-color 180ms ease,
+        box-shadow 180ms ease;
+}
+
+
+.job-card:hover {
+    transform: translateY(-2px);
+
+    border-color: #cdd1d7;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+
+.job-main {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 16px;
+
+    min-width: 0;
+}
+
+
+.company-logo {
+    width: 44px;
+    height: 44px;
+
+    flex-shrink: 0;
+
+    display: grid;
+
+    place-items: center;
+
+    border-radius: 12px;
+
+    background: #eef0f3;
+
+    font-weight: 800;
+}
+
+
+.job-info {
+    min-width: 0;
+}
+
+
+.job-info h4 {
+    font-size: 17px;
+
+    letter-spacing: -0.015em;
+}
+
+
+.company {
+    margin-top: 3px;
+
+    color: #555b64;
+
+    font-size: 14px;
+}
+
+
+.job-meta {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-top: 10px;
+}
+
+
+.job-meta span {
+    padding: 4px 8px;
+
+    border-radius: 6px;
+
+    background: #f2f3f5;
+
+    font-size: 11px;
+
+    color: #686e78;
+}
+
+
+.job-side {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-end;
+
+    gap: 8px;
+
+    flex-shrink: 0;
+}
+
+
+.salary {
+    font-size: 12px;
+
+    color: #555b64;
+}
+
+
+.salary.muted {
+    color: #9a9da3;
+}
+
+
+.job-side a {
+    color: #111827;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    text-decoration: none;
+}
+
+
+.job-side a:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.empty-state {
+    padding: 70px 20px;
+
+    text-align: center;
+
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 16px;
+}
+
+
+.empty-state p {
+    margin-top: 5px;
+
+    color: #858a92;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer {
+    padding: 30px 5vw;
+
+    border-top: 1px solid #e5e7eb;
+
+    text-align: center;
+
+    color: #858a92;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .topbar {
+        padding: 0 5%;
+    }
+
+
+    .health {
+        display: none;
+    }
+
+
+    .hero {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        padding: 60px 0 45px;
+    }
+
+
+    .hero h2 {
+        font-size: 54px;
+    }
+
+
+    .hero-card {
+        min-width: 0;
+    }
+
+
+    .stats {
+        grid-template-columns: 1fr;
+
+        margin-bottom: 55px;
+    }
+
+
+    .pipeline-flow {
+        flex-direction: column;
+    }
+
+
+    .pipeline-arrow {
+        transform: rotate(90deg);
+
+        height: 15px;
+    }
+
+
+    .section-heading {
+        align-items: flex-start;
+    }
+
+
+    .job-card {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+
+    .job-side {
+        align-items: flex-start;
+    }
+
+}
