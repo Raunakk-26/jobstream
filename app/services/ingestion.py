@@ -13,7 +13,7 @@ from app.parsers.rss_job_parser import RSSJobParser
 
 def run_ingestion():
 
-    # Create database tables if they do not exist
+    # Create database tables
     create_jobs_table()
 
     source = "Himalayas API"
@@ -22,12 +22,8 @@ def run_ingestion():
 
     fetched_jobs = []
 
-    # ---------------------------------------------------------
-    # PRIMARY SOURCE: HIMALAYAS API
-    # ---------------------------------------------------------
-
+    # Primary API
     try:
-
         fetcher = HimalayasFetcher()
 
         fetched_jobs = fetcher.fetch_jobs(
@@ -36,44 +32,30 @@ def run_ingestion():
 
     except Exception as api_error:
 
-        print(
-            f"API failed: {api_error}"
-        )
+        print(f"Primary API failed: {api_error}")
 
-        # -----------------------------------------------------
-        # FALLBACK: HIMALAYAS RSS
-        # -----------------------------------------------------
-
+        # RSS fallback
         try:
-
             fallback_used = True
             source = "Himalayas RSS"
 
-            rss_fetcher = HimalayasRSSFetcher()
+            fetcher = HimalayasRSSFetcher()
 
-            fetched_jobs = rss_fetcher.fetch_jobs()
+            fetched_jobs = fetcher.fetch_jobs()
 
         except Exception as rss_error:
 
             error = str(rss_error)
 
-            print(
-                f"RSS fallback failed: {rss_error}"
-            )
+            print(f"RSS fallback failed: {rss_error}")
 
             fetched_jobs = []
 
 
-    # ---------------------------------------------------------
-    # PARSE JOBS
-    # ---------------------------------------------------------
-
+    # Select parser
     if fallback_used:
-
         parser = RSSJobParser()
-
     else:
-
         parser = JobParser()
 
 
@@ -81,66 +63,39 @@ def run_ingestion():
     duplicates = 0
 
 
-    # ---------------------------------------------------------
-    # SAVE JOBS
-    # ---------------------------------------------------------
-
+    # Parse and save jobs
     for raw_job in fetched_jobs:
 
         try:
 
-            job = parser.parse_job(
-                raw_job
-            )
+            job = parser.parse_job(raw_job)
 
-            inserted = save_job(
-                job
-            )
+            inserted = save_job(job)
 
             if inserted:
-
                 new_jobs += 1
-
             else:
-
                 duplicates += 1
 
-        except Exception as parse_error:
+        except Exception as job_error:
 
-            print(
-                f"Could not process job: {parse_error}"
-            )
+            print(f"Could not process job: {job_error}")
 
 
-    # ---------------------------------------------------------
-    # SAVE INGESTION REPORT
-    # ---------------------------------------------------------
-
+    # Save ingestion report
     report = {
-
         "source": source,
-
         "fetched": len(fetched_jobs),
-
         "new_jobs": new_jobs,
-
         "duplicates": duplicates,
-
         "fallback_used": fallback_used,
-
         "error": error
     }
 
-
-    save_ingestion_report(
-        report
-    )
+    save_ingestion_report(report)
 
 
-    # ---------------------------------------------------------
-    # PRINT REPORT
-    # ---------------------------------------------------------
-
+    # Console report
     print()
     print("========== INGESTION REPORT ==========")
     print(f"Source:       {source}")
@@ -156,5 +111,4 @@ def run_ingestion():
 
 
 if __name__ == "__main__":
-
     run_ingestion()
